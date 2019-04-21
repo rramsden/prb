@@ -1,16 +1,16 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "potime/version"
+require "prb/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "potime"
-  spec.version       = Potime::VERSION
+  spec.name          = "prb"
+  spec.version       = Prb::VERSION
   spec.authors       = ["Richard Ramsden"]
   spec.email         = ["richard@rramsden.ca"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = "Pomodoro timer CLI written in Ruby"
+  spec.description   = "Small CLI client for rendering a pomodoro timer"
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
