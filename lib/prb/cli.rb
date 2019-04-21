@@ -46,6 +46,9 @@ module Prb
     end
 
     def render
+      # prevent text from being indented in terminal
+      system("stty raw opost -echo")
+
       clear_screen
 
       if @is_working
