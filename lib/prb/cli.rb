@@ -2,6 +2,7 @@ module Prb
   class CLI
     def initialize
       @controller = TimerControl.new
+      @render = true
     end
 
     def start
@@ -11,7 +12,7 @@ module Prb
       Thread.new do
         loop do
           sleep 0.1
-          render
+          render if @render
         end
       end
 
@@ -25,6 +26,10 @@ module Prb
           @controller.reset
         when "p" # pause
           @controller.pause
+        when "f" # activate firewall
+          stop_rendering do
+            @controller.toggle_firewall
+          end
         when "q"
           exit
         end
@@ -32,6 +37,13 @@ module Prb
     end
 
     private
+
+    # ask for sudo access
+    def stop_rendering
+      @render = false
+      yield
+      @render = true
+    end
 
     def render
       # prevent text from being indented in terminal
@@ -47,7 +59,8 @@ module Prb
 
       puts <<~MSG
       s) Skip
-      #{@controller.paused? ? 'p) Paused'.yellow : 'p) Pause'}
+      #{@controller.paused? ? 'p) Pause'.yellow : 'p) Pause'}
+      #{@controller.firewall.enabled? ? 'f) Firewall'.yellow : 'f) Firewall'}
       q) Quit
 
       MSG

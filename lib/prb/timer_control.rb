@@ -3,10 +3,11 @@ module Prb
     WORK_MINUTES = 25
     BREAK_MINUTES = 5
 
-    attr_reader :timer
+    attr_reader :timer, :firewall
 
     def initialize
       @timer = Timer.new(WORK_MINUTES)
+      @firewall = Firewall.new
       @is_working = true
     end
 
@@ -33,6 +34,14 @@ module Prb
 
     def is_working?
       @is_working
+    end
+
+    def toggle_firewall
+      if @firewall.enabled?
+        @firewall.deactivate!
+      else
+        @firewall.activate!
+      end
     end
 
     def toggle
