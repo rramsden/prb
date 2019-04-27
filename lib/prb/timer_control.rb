@@ -3,6 +3,8 @@ module Prb
     WORK_MINUTES = 25
     BREAK_MINUTES = 5
 
+    attr_reader :timer
+
     def initialize
       @timer = Timer.new(WORK_MINUTES)
       @is_working = true
@@ -12,10 +14,7 @@ module Prb
       Thread.new do
         loop do
           @timer.tick
-
           toggle if @timer.finished?
-
-          render
         end
       end
     end
@@ -28,28 +27,12 @@ module Prb
       @timer.pause
     end
 
-    def clear_screen
-      print "\e[H\e[2J" # clear screen
+    def paused?
+      @timer.paused?
     end
 
-    def render
-      # prevent text from being indented in terminal
-      system("stty raw opost -echo")
-
-      clear_screen
-
-      if @is_working
-        puts "[WORKING] #{@timer.render}".red
-      else
-        puts "[BREAK] #{@timer.render}".green
-      end
-
-      puts <<~MSG
-      s) Skip
-      p) Pause timer
-      q) Quit
-
-      MSG
+    def is_working?
+      @is_working
     end
 
     def toggle
