@@ -43,6 +43,13 @@ module Prb
       else
         puts "[BREAK] #{@timer.render}".green
       end
+
+      puts <<~MSG
+      s) Skip
+      p) Pause timer
+      q) Quit
+
+      MSG
     end
 
     def toggle

@@ -19,8 +19,6 @@ module Prb
         when "q"
           exit
         end
-
-        @controller.render
       end
     end
   end
