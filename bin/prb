@@ -1,6 +1,34 @@
 #!/usr/bin/env ruby
 
+require "optimist"
 require "bundler/setup"
 require "prb"
 
-Prb::CLI.new.start
+COMMAND_MAP = {
+  'start' => 'Start pomodoro service',
+  'stop' => 'Stop pomodoro service',
+  'status' => 'Print status of pomodoro service',
+  'skip' => 'Skip the current timer',
+  'reset' => 'Reset the current timer',
+  'pause' => 'Pause the current timer'
+}
+
+opts = Optimist::options do
+  version "prb v#{Prb::VERSION}"
+  banner "prb v#{Prb::VERSION} - Pomodoro timer service\n \n"
+  banner "Usage:"
+  banner "  prb [COMMAND] [SUB_COMMAND]\n \n"
+  banner "Options:"
+  opt :daemonize, 'Start the service in the background', short: '-d'
+  banner "\nCommands:"
+  COMMAND_MAP.each { |cmd, desc| banner format("  %-10s %s", cmd, desc)  }
+end
+
+commands = COMMAND_MAP.keys & ARGV
+cmd = commands.first
+
+if COMMAND_MAP.keys.include?(cmd)
+  Prb::CommandRunner.new(opts).send(cmd)
+else
+  Optimist.educate 
+end
