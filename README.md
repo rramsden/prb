@@ -1,6 +1,7 @@
 # Prb
 
-`prb` is a small CLI written in Ruby for the pomodoro technique
+`prb` is a light-weight timer service written in Ruby for the pomodoro
+technique.
 
 ## Installation
 
@@ -10,9 +11,25 @@ Install the gem
 
 ## Usage
 
-Start the timer
+```
+prb v0.1.0 - Pomodoro timer service
 
-    $ prb
+Usage:
+  prb [COMMAND] [SUB_COMMAND]
+
+Options:
+  -d, --daemonize    Start the service in the background
+
+Commands:
+  start      Start pomodoro service
+  stop       Stop pomodoro service
+  status     Print status of pomodoro service
+  skip       Skip the current timer
+  reset      Reset the current timer
+  pause      Pause the current timer
+  -v, --version      Print version and exit
+  -h, --help         Show this message
+```
 
 ## Development
 
