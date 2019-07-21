@@ -64,11 +64,13 @@ module Prb
 
     def status_line
       status = ""
-      status << "W" if @controller.is_working?
-      status << "B" if !@controller.is_working?
-      status << "P" if @controller.paused?
-      status << ","
       status << @controller.timer.render
+      status << ","
+      status << "WORKING" if @controller.is_working?
+      status << "BREAK" if !@controller.is_working?
+      status << ",PAUSED" if @controller.paused?
+      status << ",RUNNING" if !@controller.paused?
+      status
     end
   end
 end
