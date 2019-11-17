@@ -1,45 +1,36 @@
 module Prb
   class TimerControl
-    WORK_MINUTES = 25
-    BREAK_MINUTES = 5
-
     attr_reader :timer
 
-    def initialize
-      @timer = Timer.new(WORK_MINUTES)
-      @is_working = true
+    def initialize(opts)
+      @opts = opts
+      @timer = Timer.new(@opts)
     end
 
     def start
       Thread.new do
         loop do
+          sleep 1
           @timer.tick
-          toggle if @timer.finished?
         end
       end
+    end
+
+    def render_status
+      {
+        running: !@timer.paused?,
+        completed: @opts.pomodoros - @timer.pomodoros,
+        remaining: @timer.pomodoros,
+        time_remaining: @timer.seconds,
+      }.to_json
     end
 
     def reset
       @timer.reset
     end
 
-    def pause
-      @timer.pause
-    end
-
-    def paused?
-      @timer.paused?
-    end
-
-    def is_working?
-      @is_working
-    end
-
-    def toggle
-      @is_working = !@is_working
-      @timer.set_timer(@is_working ?
-                      WORK_MINUTES : BREAK_MINUTES)
-      @timer.pause unless @timer.paused?
+    def resume
+      @timer.resume
     end
   end
 end

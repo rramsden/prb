@@ -1,7 +1,7 @@
 # Prb
 
-`prb` is a light-weight timer service written in Ruby for the pomodoro
-technique.
+Prb is a light-weight HTTP service written in Ruby for controlling a pomodoro
+timer.
 
 ## Installation
 
@@ -11,24 +11,40 @@ Install the gem
 
 ## Usage
 
+The promodoro timer can be started using `prb start -d` where `-d` will
+run the process in the background.
+
 ```
-prb v0.1.0 - Pomodoro timer service
+prb start -d
+```
 
-Usage:
-  prb [COMMAND] [SUB_COMMAND]
+Options can be passed to configure the timer. By default, there are 4 pomodoro's
+each taking 25 minutes to complete. You can override this behaviour using the
+following command:
 
-Options:
-  -d, --daemonize    Start the service in the background
+```
+prb start -d --pomodoros=4 --timer=25
+```
 
-Commands:
-  start      Start pomodoro service
-  stop       Stop pomodoro service
-  status     Print status of pomodoro service
-  skip       Skip the current timer
-  reset      Reset the current timer
-  pause      Pause the current timer
-  -v, --version      Print version and exit
-  -h, --help         Show this message
+After starting the service you can query the timers status over HTTP using
+`curl`:
+
+```
+curl http://localhost:3838/status
+
+{
+    "running" true,
+    "completed": 0, # completed pomodoros
+    "remaining": 4, # remaining pomodoros
+    "time_remaining": 440
+}
+```
+
+After each pomodoro the timer will stop. The timer can be resumed
+and the next pomodoro started by using `prb resume` or by `curl` request:
+
+```
+curl http://localhost:3838/resume
 ```
 
 ## Development

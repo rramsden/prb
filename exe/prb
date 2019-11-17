@@ -1,31 +1,43 @@
 #!/usr/bin/env ruby
 
 require "optimist"
+require "webrick"
 require "bundler/setup"
 require "prb"
+require "pry"
 
 COMMAND_MAP = {
   'start' => 'Start pomodoro service',
-  'stop' => 'Stop pomodoro service',
-  'status' => 'Print status of pomodoro service',
-  'skip' => 'Skip the current timer',
-  'reset' => 'Reset the current timer',
-  'pause' => 'Pause the current timer'
+  'resume' => 'Resume pomodoro timer',
+  'stop' => 'Stop pomodoro service'
 }
 
-opts = Optimist::options do
+global_opts = Optimist::options do
   version "prb v#{Prb::VERSION}"
   banner "prb v#{Prb::VERSION} - Pomodoro timer service\n \n"
   banner "Usage:"
-  banner "  prb [COMMAND] [SUB_COMMAND]\n \n"
-  banner "Options:"
-  opt :daemonize, 'Start the service in the background', short: '-d'
+  banner "  prb [COMMAND] [SUB_COMMAND]\n"
   banner "\nCommands:"
   COMMAND_MAP.each { |cmd, desc| banner format("  %-10s %s", cmd, desc)  }
+
+  stop_on COMMAND_MAP.keys
 end
 
 commands = COMMAND_MAP.keys & ARGV
 cmd = commands.first
+opts = {}
+
+case cmd
+when "start"
+  opts = Optimist::options do
+    opt :pomodoros, "Number of pomodoros", default: 4
+    opt :timer, "The time in minutes for the timer", default: 25
+    opt :port, "The port to run the pomodoro HTTP server", default: 3838
+    opt :daemonize, 'Start the service in the background', short: '-d'
+  end
+end
+
+opts = opts.merge(global_opts)
 
 if COMMAND_MAP.keys.include?(cmd)
   Prb::CommandRunner.new(opts).send(cmd)
