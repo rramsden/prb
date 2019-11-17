@@ -4,7 +4,6 @@ require "optimist"
 require "webrick"
 require "bundler/setup"
 require "prb"
-require "pry"
 
 COMMAND_MAP = {
   'start' => 'Start pomodoro service',
