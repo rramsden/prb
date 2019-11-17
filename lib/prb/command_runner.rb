@@ -1,6 +1,3 @@
-require 'rack'
-require 'rack/server'
-
 module Prb
   class CommandRunner
     def initialize(opts)
@@ -36,6 +33,7 @@ module Prb
       uri = URI.parse("http://0.0.0.0:#{@opts.port}/#{endpoint}")
       Net::HTTP.get_response(uri)
     rescue
+      nil
     end
 
     def running?(port)
