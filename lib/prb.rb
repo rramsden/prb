@@ -1,4 +1,7 @@
 require 'json'
+require 'net/http'
+require 'rack'
+require 'rack/server'
 
 require_relative "prb/version"
 require_relative "prb/opts"
