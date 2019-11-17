@@ -1,41 +1,57 @@
 module Prb
   class Timer
-    def initialize(minutes)
-      @paused = false
-      set_timer(minutes)
-    end
+    attr_reader :pomodoros, :seconds, :paused, :completed
 
-    def set_timer(minutes)
-      @_seconds = minutes * 60
-      @seconds = @_seconds
+    WORKING = 1
+    PAUSED = 2
+
+    def initialize(opts)
+      @opts = opts
+
+      @paused = false
+      @pomodoros = opts.pomodoros
+
+      # set pomodoro timer
+      set_timer(@opts.timer)
     end
 
     def tick
-      sleep 1
-      @seconds -= 1 unless @paused or finished?
+      return if completed? or paused? 
+
+      if @seconds == 0
+        if @paused == false
+          @pomodoros -= 1
+          @paused = true
+        end
+      else
+        @seconds -= 1
+      end
     end
 
-    def finished?
-      @seconds == 0
+    def resume
+      @paused = false
+      set_timer(@opts.timer)
     end
 
     def reset
-      @seconds = @_seconds
-    end
-
-    def pause
-      @paused = !@paused
+      @paused = false
+      @pomodoros = @opts.pomodoros
+      set_timer(@opts.timer)
     end
 
     def paused?
       @paused
     end
 
-    def render
-      min = (@seconds / 60) % 60
-      sec = (@seconds % 60)
+    private
 
-      format("%02d:%02d", min, sec)
+    def set_timer(minutes)
+      @_seconds = minutes * 60
+      @seconds = @_seconds
+    end
+
+    def completed?
+      @pomodoros == 0
     end
   end
 end

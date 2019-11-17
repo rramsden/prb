@@ -1,76 +1,40 @@
-require 'socket'
 require 'timeout'
+require 'sinatra/base'
 
 module Prb
-  PRB_PORT = 3838
+  class Server < Sinatra::Base
+    def initialize(opts)
+      puts <<~MSG
+      Starting pomodoro service...
 
-  class Server
-    def initialize
-      @controller = TimerControl.new
-    end
+      Number of pomodoros: #{opts.pomodoros} pomodoro(s)
+      Pomodoro timer:      #{opts.timer} minute(s)
 
-    def start
+      MSG
+
+      @controller = TimerControl.new(opts)
       @controller.start
 
-      server = TCPServer.open('127.0.0.1', PRB_PORT)
-      puts "Server listening on #{PRB_PORT}"
-
-      while true
-        Thread.start(server.accept) do |socket|
-          while cmd = socket.gets.chomp
-            puts "RECV: #{cmd}"
-
-            output = "OK"
-            case cmd
-            when 'STATUS'
-              output = status_line
-            when 'SKIP'
-              @controller.toggle
-            when 'RESET'
-              @controller.reset
-            when 'PAUSE'
-              @controller.pause
-            when 'QUIT'
-              socket.puts "OK"
-              exit(0)
-            else
-              puts "ERR: #{cmd} not a command"
-              output = "ERR: #{cmd} not a command"
-            end
-
-            socket.puts output
-          end
-
-          socket.close
-        end
-      end
-
-      server.close
+      super
     end
 
-    def self.running?
-      Timeout::timeout(1) do
-        begin
-          s = TCPSocket.new('127.0.0.1', PRB_PORT)
-          s.close
-          return true
-        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-          return false
-        end
-      end
+    get '/status' do
+      content_type :json
+      @controller.render_status
     end
 
-    private
+    get '/reset' do
+      @controller.reset
+      status 200
+    end
 
-    def status_line
-      status = ""
-      status << @controller.timer.render
-      status << ","
-      status << "WORKING" if @controller.is_working?
-      status << "BREAK" if !@controller.is_working?
-      status << ",PAUSED" if @controller.paused?
-      status << ",RUNNING" if !@controller.paused?
-      status
+    get '/resume' do
+      @controller.resume
+      status 200
+    end
+
+    get '/stop' do
+      Process.kill("INT", Process.pid)
     end
   end
 end

@@ -1,57 +1,53 @@
+require 'rack'
+require 'rack/server'
+
 module Prb
   class CommandRunner
     def initialize(opts)
-      @opts = opts
+      @opts = Opts.new(opts)
     end
 
     def start
-      if Prb::Server.running?
+      if running?(@opts.port)
         puts "A prb server is already running."
         exit(1)
       end
 
-      Process.daemon() if @opts[:daemonize]
+      Process.daemon() if @opts.daemonize?
 
-      Prb::Server.new.start
+      app = Prb::Server.new(@opts)
+      Rack::Server.start(
+        app: app,
+        Port: @opts.port
+      )
     end
 
-    def status
-      response = send_command('STATUS')
-      puts response
-    end
-
-    def skip
-      send_command('SKIP')
-    end
-
-    def pause
-      send_command('PAUSE')
-    end
-
-    def reset
-      send_command('RESET')
+    def resume
+      send_request('resume')
     end
 
     def stop
-      send_command('QUIT')
+      send_request('stop')
     end
 
     private
 
-    def send_command(cmd)
+    def send_request(endpoint)
+      uri = URI.parse("http://0.0.0.0:#{@opts.port}/#{endpoint}")
+      Net::HTTP.get_response(uri)
+    rescue
+    end
+
+    def running?(port)
       Timeout::timeout(1) do
         begin
-          s = TCPSocket.new('127.0.0.1', PRB_PORT)
-          s.puts(cmd)
-          response = s.gets.chomp
+          s = TCPSocket.new('0.0.0.0', port)
           s.close
-          return response
+          return true
         rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-          puts "A prb server is not running"
-          exit(1)
+          return false
         end
       end
     end
   end
-
 end
