@@ -2,8 +2,8 @@ PATH
   remote: .
   specs:
     prb (0.2.0)
-      optimist
-      sinatra
+      optimist (~> 3.0)
+      sinatra (~> 2.0)
 
 GEM
   remote: https://rubygems.org/
